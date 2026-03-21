@@ -1,0 +1,1 @@
+create 'law_visit_log_als_recommends',{NAME=>'recommends',VERSIONS=>10},SPLITS => ['10', '20', '30', '40','50','60','70','80','90']

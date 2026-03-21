@@ -1,0 +1,19 @@
+大数据案例实战 书籍源码
+
+源码版本：
+    JDK1.8、CDH5.7.3、Hadoop2.6、Spark1.6、Hive1.1.2 、HBase1.2
+
+源码架构：
+    spark_hadoop_common： Spark、Hadoop基本依赖，提供运行Spark算法调用接口；
+    law_project: 法律服务大数据智能推荐项目源码；
+    law_recommend:法律服务大数据智能推荐项目源码（推荐REST接口）；
+    law_scripts: 法律服务大数据智能推荐项目脚本目录；
+
+    user_profile_project: 广电大数据用户画像项目源码；
+    user_profile_visualization:广电大数据用户画像（画像展示）；
+    user_profile_scripts: 广电大数据用户画像脚本目录；
+
+    timer_job_admin: 定时任务后台界面；
+    timer_job_core: 定时任务核心模块；
+    timer_job_java_executor: 定时任务java执行器；
+    timer_job_shell_executor: 定时任务shell执行器；

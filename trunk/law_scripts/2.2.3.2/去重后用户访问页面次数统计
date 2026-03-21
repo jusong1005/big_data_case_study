@@ -1,0 +1,7 @@
+// 加载数据
+val data = sqlContext.sql("select * from law.law_visit_log_all_cleaned_101003")
+val num = data.select("userid").distinct.count
+
+// 数据去重后，统计用户访问页面个数统计
+
+data.select("userid","fullurl","timestamp_format").distinct.groupBy("userid").agg(count(lit(1)) as "url_times").groupBy("url_times").agg(count(lit(1)) as "url_times_user_size").withColumn("url_times_user_size_percent", col("url_times_user_size")*100.0/num).orderBy(desc("url_times_user_size")).show(30)

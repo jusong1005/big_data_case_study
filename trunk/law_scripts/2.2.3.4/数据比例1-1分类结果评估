@@ -1,0 +1,18 @@
+def unionData(data:DataFrame):DataFrame={
+    val data1=data.filter(label+"=1")
+    val size=data1.count()*1
+    val data0=data.filter(label+"=0").limit(size.toInt)
+    data0.unionAll(data1)
+  }
+val union_data=unionData(scaled_data)
+val Array(train,test) = union_data.randomSplit(Array(0.8,0.2))
+test.show(100,false)
+val model = create_model(train)
+val (accuracy,metrics) = evaluate_model2(test, model)
+println("Test Error = " + (1.0 - accuracy))
+println(metrics.confusionMatrix)
+println("f:"+metrics.weightedFMeasure)
+println("precision:"+metrics.weightedPrecision)
+println("recall:"+metrics.weightedRecall)
+println("test.count:"+test.count())
+println("test.1.count:"+test.filter(label+" = 1").count)

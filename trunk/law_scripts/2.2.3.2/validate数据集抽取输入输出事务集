@@ -1,0 +1,33 @@
+import java.text.SimpleDateFormat
+import org.apache.spark.sql.DataFrame
+
+// 定义抽取函数
+def generateInputOutput(data: DataFrame, interval: Int):DataFrame ={
+    val uidCol = "userid"
+    val urlCol = "fullurl"
+    val time_url = "time_url"
+    val time_url_list = "time_url_list"
+    val timeCol = "timestamp_format"
+    val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    val split_in_out = udf{(time_url_arr:Seq[org.apache.spark.sql.Row], interval:Int) =>
+      val time_url_list = time_url_arr.map(x => (x.getString(0),x.getString(1))).sortBy(x => x._1)
+      val final_interval = interval * 60 * 1000
+      val first = time_url_list.head // first._2 is the input
+      val second = time_url_list.tail.takeWhile(p =>
+        (simpleDateFormat.parse(p._1).getTime - simpleDateFormat.parse(first._1).getTime) <= final_interval)
+        .map(p => p._2)
+      Array(Seq(first._2),second)
+    }
+    data.select(col(uidCol),struct(col(timeCol),col(urlCol)) as time_url)
+      .groupBy(uidCol).agg(collect_list(time_url) as time_url_list).withColumn(time_url_list,split_in_out(col(time_url_list),lit(interval))).select(col(uidCol),col(time_url_list).getItem(0).as("urls_in"),col(time_url_list).getItem(1).as("urls_out"))
+}
+
+// 测试， 使用7分钟
+val valid_data_test = generateInputOutput(valid_data, 7)
+valid_data_test.show(2,false)
++---------------------+---------------------------------------------+-----------------------------------------------------------------------------------------+
+|userid               |urls_in                                      |urls_out                                                                                 |
++---------------------+---------------------------------------------+-----------------------------------------------------------------------------------------+
+|1000145129.1414151996|[http://www.xxx.cn/ask/question_5395919.html]|[http://www.xxx.cn/ask/question_888090.html, http://www.xxx.cn/ask/question_5395919.html]|
+|10003778.1414722164  |[http://www.xxx.cn/ask/question_1302806.html]|[]                                                                                       |
++---------------------+---------------------------------------------+-----------------------------------------------------------------------------------------+

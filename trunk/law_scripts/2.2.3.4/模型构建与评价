@@ -1,0 +1,40 @@
+import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+import org.apache.spark.ml.{Pipeline,PipelineModel}
+/**
+  * 随机森林 测试类
+  */
+def create_model(data: DataFrame) = {
+    val labelIndexer = new StringIndexer().setInputCol(label).setOutputCol(indexedLabel).fit(data)
+    val featureIndexer = new VectorIndexer().setInputCol(scaled_features).setOutputCol(indexedFeatures).setMaxCategories(4).fit(data)
+    val rf = new RandomForestClassifier().setLabelCol(indexedLabel).setFeaturesCol(indexedFeatures).setNumTrees(10).setPredictionCol(predict_column)
+    val labelConverter = new IndexToString().setInputCol(predict_column).setOutputCol(predictedLabel).setLabels(labelIndexer.labels)
+    val pipeline = new Pipeline().setStages(Array(labelIndexer, featureIndexer, rf, labelConverter))
+    val model = pipeline.fit(data)
+    model
+  }
+def evaluate_model2(data: DataFrame, model:PipelineModel ) = {
+    val predictions=model.transform(data)
+    predictions.select(predictedLabel, label, scaled_features).show(5)
+    // Select (prediction, true label) and compute test error
+    val evaluator = new MulticlassClassificationEvaluator().setLabelCol(indexedLabel).setPredictionCol(predict_column).setMetricName("precision")
+    val accuracy = evaluator.evaluate(predictions)
+    val metrics = new MulticlassMetrics(predictions.select(predict_column, indexedLabel).rdd.map(t => (t.getDouble(0),t.getDouble(1))))
+    (accuracy,metrics)
+  }
+val Array(train,test) = scaled_data.randomSplit(Array(0.8,0.2))
+val model = create_model(train)
+val (accuracy,metrics) = evaluate_model2(test, model)
+println("Test Error = " + (1.0 - accuracy))
+println(metrics.confusionMatrix)
+println("f:"+metrics.weightedFMeasure)
+println("precision:"+metrics.weightedPrecision)
+println("recall:"+metrics.weightedRecall)
+println("test.count:"+test.count())
+println("test.1.count:"+test.filter(label+" = 1").count)

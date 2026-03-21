@@ -1,0 +1,11 @@
+// 确保加载了valid_data、rules、getWithRecommend
+
+// 获得输入输出事务集
+val in_out = generateInputOutput(valid_data, 7)
+
+//获得输入事务集
+val in = in_out.rdd.map(row => row.getSeq[String](1))
+
+// 推荐
+val result = getWithRecommend(rules, in, 1)
+

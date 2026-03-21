@@ -1,0 +1,7 @@
+disable 'law_recommend'
+drop 'law_recommend'
+create 'law_recommend',{NAME=>'recommends',VERSIONS=>20},SPLITS=>["10","20","30","40","50","60","70","80","90"]
+
+//create 'law_recommend2',{NAME=>'recommends',VERSIONS=>20},{NUMREGIONS => 20, SPLITALGO => 'HexStringSplit'}
+//数据从MYSQL导入HBase
+sqoop  import  --connect jdbc:mysql://192.168.111.75:3306/law_init --username root --password root --table law_recommend --hbase-table law_recommend --column-family recommends --hbase-row-key userid --hbase-create-table -m 1

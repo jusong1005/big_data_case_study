@@ -1,0 +1,2 @@
+drop table if exists media_1d;
+create table media_1d as select terminal_no,phone_no,duration,station_name,concat(CURRENT_DATE,' ',from_unixtime(unix_timestamp(origin_time),"HH:mm:ss")) as origin_time,concat(CURRENT_DATE,' ',from_unixtime(unix_timestamp(end_time),"HH:mm:ss")) as end_time,owner_code,owner_name,vod_cat_tags,resolution,audio_lang,region,res_name,res_type,vod_title,category_name,program_title,sm_name,first_show_time from media_index_3m where date_add(origin_time,161) = date_sub(CURRENT_DATE,3);

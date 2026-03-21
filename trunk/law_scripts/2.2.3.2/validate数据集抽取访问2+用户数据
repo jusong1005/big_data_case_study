@@ -1,0 +1,8 @@
+// 加载数据
+val test_data = sqlContext.sql("select * from law.law_visit_log_all_cleaned_101003_fp_validate")
+
+// 访问2+用户
+val validate_users = test_data.select("userid").groupBy("userid").agg(count(lit(1)) as "num").filter("num > 1").select("userid")
+
+// 访问2+ 用户数据
+val valid_data = test_data.join(validate_users, test_data("userid") === validate_users("userid")).select(test_data("userid"),test_data("fullurl"), test_data("timestamp_format"))

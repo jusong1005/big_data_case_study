@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
     <name>law_project</name>
     <properties>
-        <hbase.version>1.2.0-cdh5.7.3</hbase.version>
+        <hbase.version>1.2.0</hbase.version>
     </properties>
     <repositories>
         <repository>

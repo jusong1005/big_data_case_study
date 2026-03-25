@@ -38,7 +38,7 @@ public class AlsModelRecommendSecondStepTest {
             path = fileStatus.getPath();
             modelPath = path.toString().replace(uri, "");
             recTable = REC_TABLE_PREFIX + path.getName();
-            log.info("model ID:{}, modelPath:{}, recTable:{}", path.getName(), modelPath, recTable);
+            log.info("model ID:{}, modelPath:{}, recTable:{}", new Object[]{path.getName(), modelPath, recTable});
             run(modelPath, recTable);
             if (i >= max_models) {// 用于测试
                 break;

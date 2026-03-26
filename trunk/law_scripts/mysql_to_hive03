@@ -1,6 +1,6 @@
 一、Sqoop全量导入数据到Hive
 通过Sqoop将MySQL数据库law_init的表lawtime_all中的数据导入Hive数据库law_init中的lawtime_all表
-sqoop --import --connect jdbc:mysql://192.168.111.75:3306/law_init --username root --password root --table lawtime_all --direct --hive-import --hive-database law_init --hive-table lawtime_all --driver com.mysql.jdbc.Driver --m 20 --split-by userid
+sqoop --import --connect jdbc:mysql://192.168.2.162:3306/law_init --username root --password 123456 --table lawtime_all --direct --hive-import --hive-database law_init --hive-table lawtime_all --driver com.mysql.jdbc.Driver --m 20 --split-by userid
 
 二、Sqoop增量更新数据到Hive
 第1步：在Shell脚本中创建一个Sqoop的任务，任务的内容是增量导入MySQL的数据到Hive

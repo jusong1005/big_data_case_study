@@ -43,7 +43,7 @@ object ElasticsearchMulti2Hive {
     val startTime = args(9)
     val db = args(10)
     val options = Map(
-      ("es.nodes", "192.168.111.75"),
+      ("es.nodes", "192.168.2.162"),
       ("es.port", "9200"),
       ("es.read.metadata", "false"),
       ("es.mapping.date.rich", "false"),

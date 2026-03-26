@@ -1,4 +1,4 @@
 shell参数列表：
-2018-07-01 192.168.111.75 server3 /root/qwm/zjsm.jar  9200 year_month mmconsume_billevents_update doc
+2018-07-01 192.168.2.162 server3 /root/qwm/zjsm.jar  9200 year_month mmconsume_billevents_update doc
 cron表达式：
 0 10 3 1 * ? *

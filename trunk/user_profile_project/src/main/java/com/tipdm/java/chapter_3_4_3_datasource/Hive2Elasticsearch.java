@@ -17,7 +17,7 @@ public class Hive2Elasticsearch {
     public static void main(String[] args) throws Exception {
         String[] arguments = new String[6];
         arguments[0] = "media_1d";
-        arguments[1] = "192.168.111.75";
+        arguments[1] = "192.168.2.162";
         arguments[2] = "9200";
         arguments[3] = "origin_time";
         arguments[4] = "media_index";

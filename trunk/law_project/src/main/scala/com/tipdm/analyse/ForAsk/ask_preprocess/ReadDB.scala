@@ -12,9 +12,9 @@ import org.apache.spark.sql.DataFrame
   */
 object ReadDB {
 
-  val url = "jdbc:mysql://192.168.111.75:3306/law_fansy?useUnicode=true&characterEncoding=utf8"
+  val url = "jdbc:mysql://192.168.2.162:3306/law_fansy?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true"
   val user = "root"
-  val password = "root"
+  val password="123456"
   val table = "law_fansy.gz_lawyer_data"
   val driver = "com.mysql.jdbc.Driver"
 

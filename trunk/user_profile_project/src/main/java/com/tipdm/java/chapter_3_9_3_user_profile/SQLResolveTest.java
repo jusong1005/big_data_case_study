@@ -18,7 +18,7 @@ public class SQLResolveTest {
         arguments[2] = "sqlEngine_test";
         arguments[3] = "rdbms";
         arguments[4] = "overwrite";
-        arguments[5] = "jdbc:mysql://192.168.111.75:3306/user_profile";
+        arguments[5] = "jdbc:mysql://192.168.2.162:3306/zjsm?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true";
         arguments[6] = "root";
         arguments[7] = "root";
         Args innerArgs = Args.getArgs(applicationName,className,arguments);

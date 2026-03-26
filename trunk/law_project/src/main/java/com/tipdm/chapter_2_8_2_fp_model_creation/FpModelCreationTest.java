@@ -25,7 +25,7 @@ public class FpModelCreationTest {
         String url = "jdbc:mysql://node1:3306/law?characterEncoding=UTF-8";
         String table = "model_args";
         String user = "root";
-        String password = "root";
+        String password="123456";
         String[] args = new String[]{
                 inputTable,
                 modelPath,

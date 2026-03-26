@@ -17,4 +17,4 @@ rec10 varchar(200)
 
 
 //hive导入数据到mysql
-sqoop export --connect jdbc:mysql://192.168.111.75:3306/law_init --username root --password root --table law_recommend --export-dir /user/hive/warehouse/law_init/law_recommend
+sqoop export --connect jdbc:mysql://192.168.2.162:3306/law_init --username root --password 123456 --table law_recommend --export-dir /user/hive/warehouse/law_init/law_recommend

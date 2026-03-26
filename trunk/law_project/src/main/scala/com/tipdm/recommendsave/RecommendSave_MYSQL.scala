@@ -10,7 +10,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object RecommendSave_MYSQL {
   def writeData(data: DataFrame, table: String, database: String, ip: String) = {
     val user = "root"
-    val password = "root"
+    val password="123456"
     val driver = "com.mysql.jdbc.Driver"
     val saveMode = SaveMode.Overwrite
     val url = "jdbc:mysql://" + ip + ":3306/" + database + "?useUnicode=true&characterEncoding=utf8"

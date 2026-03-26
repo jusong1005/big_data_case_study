@@ -13,7 +13,7 @@ public class RecommendSave_MYSQL {
         myArgs[1] = "/user/root/fpRecommendPath";
         myArgs[2] = "law_recommend";
         myArgs[3] = "law_init";
-        myArgs[4] = "192.168.111.75";
+        myArgs[4] = "192.168.2.162";
         myArgs[5] = "10";
         myArgs[6] = "userid,rec1,rec2,rec3,rec4,rec5,rec6,rec7,rec8,rec9,rec10";
 

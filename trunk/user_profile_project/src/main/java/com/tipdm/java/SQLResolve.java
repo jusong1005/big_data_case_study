@@ -46,7 +46,7 @@ public class SQLResolve {
             arguments[1] = sql;
             arguments[2] = "user_label";
             arguments[3] = "rdbms";
-            arguments[5] = "jdbc:mysql://192.168.111.75:3306/zjsm";
+            arguments[5] = "jdbc:mysql://192.168.2.162:3306/zjsm?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true";
             arguments[6] = "root";
             arguments[7] = "root";
 //            String applicationId = SparkEngine.submit(applicationName, className, arguments);

@@ -20,7 +20,7 @@ public class Result2MySQLTest {
         String url = "jdbc:mysql://node1:3306/law?characterEncoding=UTF-8";
         String table = "law_visit_log_als_recommends";
         String user = "root";
-        String password = "root";
+        String password="123456";
         String[] args = new String[]{
                 inputTableDB,
                 inputTablePrefix,

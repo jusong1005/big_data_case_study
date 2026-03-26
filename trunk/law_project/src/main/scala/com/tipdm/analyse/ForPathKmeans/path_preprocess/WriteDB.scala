@@ -14,7 +14,7 @@ object WriteDB {
   def writeData(data: DataFrame, table: String) = {
     val url = "jdbc:mysql://localhost:3306/law_init?useUnicode=true&characterEncoding=utf8"
     val user = "root"
-    val password = "root"
+    val password="123456"
     val driver = "com.mysql.jdbc.Driver"
     val properties = new Properties()
     properties.put("user", user)

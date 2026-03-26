@@ -26,7 +26,7 @@ public class AlsModelCreationFirstStepTest {
         String url = "jdbc:mysql://node1:3306/law?characterEncoding=UTF-8";
         String table = "als_model_args";
         String user = "root";
-        String password = "root";
+        String password="123456";
         String modelTable = "/tmp/spark/als_split_model";
         String[] args = new String[]{
                 inputTable,

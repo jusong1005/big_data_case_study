@@ -1,4 +1,4 @@
 shell参数列表：
-2018-10-10 create_order_index_1d.hql 2018-01-01 server3 /root/qwm/zjsm.jar 192.168.111.75 9200 optdate order_test2 doc
+2018-10-10 create_order_index_1d.hql 2018-01-01 server3 /root/qwm/zjsm.jar 192.168.2.162 9200 optdate order_test2 doc
 cron表达式：
 0 10 2 * * ? *

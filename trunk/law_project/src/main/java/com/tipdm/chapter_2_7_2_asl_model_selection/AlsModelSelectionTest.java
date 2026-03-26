@@ -26,7 +26,7 @@ import com.tipdm.engine.SparkYarnJob;
             String url = "jdbc:mysql://node1:3306/law?characterEncoding=UTF-8";
             String table = "als_model_args";
             String user = "root";
-            String password = "root";
+            String password="123456";
 //            String bestModelPath = "law.lawtime_als_algorithm";  //参数存放hive表
             String recNums = "10";  //推荐个数
             String[] args = new String[]{

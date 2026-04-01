@@ -25,7 +25,8 @@ object KafkaStream {
     // 相地模式运行可使用conf.setMaster("local[*]")
 //     conf.setMaster("local[*]")
     // 窗口时间设置为30分钟
-    val ssc = new StreamingContext(conf, Seconds(60*30))
+    //val ssc = new StreamingContext(conf, Seconds(60*30))
+    val ssc = new StreamingContext(conf, Seconds(10))
     val sqlContext = new SQLContext(ssc.sparkContext)
     val properties: Properties = new Properties()
     val inputStream: InputStream = getClass.getResourceAsStream("/sysconfig/kafka.properties")

@@ -58,6 +58,9 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>1.5.10.RELEASE</version>
+                <configuration>
+                    <jvm>D:\java\jdk1.8.0_202\bin\java.exe</jvm>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>

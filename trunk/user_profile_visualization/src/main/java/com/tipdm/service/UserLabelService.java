@@ -55,5 +55,9 @@ public class UserLabelService {
         map.put("parentName", parent);
         return map;
     }
+
+    public List<Long> getSamplePhoneNos() {
+        return userLabelRepository.findSamplePhoneNos();
+    }
 }
 

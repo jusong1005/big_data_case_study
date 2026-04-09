@@ -13,4 +13,7 @@ public interface UserLabelRepository extends BaseReporitory<CustomerUnLabel, Lon
 
     @Query(value = "select * from user_label where phone_no=?1 and label is  not NULL ", nativeQuery = true)
     public List<CustomerUnLabel> findByPhoneNo(Long phoneNo);
+
+    @Query(value = "select phone_no from user_label group by phone_no limit 10", nativeQuery = true)
+    public List<Long> findSamplePhoneNos();
 }

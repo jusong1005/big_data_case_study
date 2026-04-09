@@ -35,6 +35,12 @@ public class UserLabelController {
         return userLabelService.getLabelsByPhoneNo(id);
     }
 
+    @GetMapping("/samples")
+    @ResponseBody
+    public List<Long> getSampleUsers() {
+        return userLabelService.getSamplePhoneNos();
+    }
+
     @GetMapping("/users/{id}/all/")
     @ResponseBody
     public HttpEntity getLabelController(@PathVariable(name = "id") Long id, HttpServletRequest request, HttpServletResponse response) {

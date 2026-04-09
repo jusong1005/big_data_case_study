@@ -17,5 +17,8 @@ public class HomeController {
         return "index";
     }
 
-
+    @GetMapping("/screen")
+    public String screen() {
+        return "screen";
+    }
 }

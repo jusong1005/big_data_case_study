@@ -19,6 +19,7 @@
                 <span class="logo-text">广电大数据用户画像平台</span>
             </div>
             <div class="nav-info">
+                <a href="screen" style="color:#22D3EE; text-decoration:none; border:1px solid rgba(34,211,238,0.3); padding:4px 14px; border-radius:6px; font-size:13px;">实时大屏</a>
                 <span><span class="status-dot"></span>系统运行中</span>
                 <span id="currentTime"></span>
             </div>
@@ -56,9 +57,9 @@
                     <button class="btn btn-secondary" v-on:click="labelDetail">标签详情</button>
                     <button class="btn btn-secondary" v-on:click="randomUser" title="随机选取一个用户">随机</button>
                 </div>
-                <div v-if="sampleUsers.length > 0" style="margin-top:12px;">
+                <div v-if="sampleUsers.length > 0" style="margin-top:12px; display:flex; flex-wrap:wrap; align-items:center; gap:6px;">
                     <span style="font-size:12px; color:#64748B;">示例用户：</span>
-                    <span v-for="uid in sampleUsers" v-on:click="selectUser(uid)" style="font-size:12px; color:#3B82F6; cursor:pointer; margin-right:8px; padding:2px 8px; border-radius:4px; border:1px solid rgba(59,130,246,0.2); background:rgba(59,130,246,0.05);">{{uid}}</span>
+                    <span v-for="uid in sampleUsers" v-on:click="selectUser(uid)" style="font-size:12px; color:#3B82F6; cursor:pointer; padding:2px 8px; border-radius:4px; border:1px solid rgba(59,130,246,0.2); background:rgba(59,130,246,0.05);">{{uid}}</span>
                 </div>
             </div>
         </div>
@@ -172,44 +173,41 @@ var graphOption = {
         edgeSymbol: ['none', 'arrow'],
         edgeSymbolSize: [0, 6],
         data: [
-            { name: '用户标签', symbolSize: 70, symbol: 'circle',
+            // 中心节点
+            { name: '用户画像', symbolSize: 70, symbol: 'circle',
               label: { color: '#fff', position: 'inside', fontSize: 14 },
-              itemStyle: { color: { type: 'radial', x: 0.5, y: 0.5, r: 0.5, colorStops: [{offset: 0, color: '#3B82F6'},{offset: 1, color: '#1E40AF'}] }, shadowBlur: 20, shadowColor: 'rgba(59,130,246,0.5)' }
+              itemStyle: { color: '#1E40AF', shadowBlur: 20, shadowColor: 'rgba(59,130,246,0.5)' }
             },
-            { name: '基本特征', symbolSize: 50, itemStyle: { color: '#22D3EE' }, label: { color: '#22D3EE' } },
-            { name: '兴趣爱好', symbolSize: 50, itemStyle: { color: '#22C55E' }, label: { color: '#22C55E' } },
-            { name: '业务特征', symbolSize: 50, itemStyle: { color: '#F59E0B' }, label: { color: '#F59E0B' } },
-            { name: '社会特征', symbolSize: 50, itemStyle: { color: '#A78BFA' }, label: { color: '#A78BFA' } },
-            { name: '家庭地址', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '有无孩童', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '经济能力', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '教育节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '少儿节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '娱乐节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '基础业务', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '网络业务', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '优惠偏好', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '生活习惯', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '购物圈', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } },
-            { name: '交友圈', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } }
+            // 三大分类
+            { name: '消费维度', symbolSize: 50, itemStyle: { color: '#22D3EE' }, label: { color: '#22D3EE' } },
+            { name: '业务维度', symbolSize: 50, itemStyle: { color: '#F59E0B' }, label: { color: '#F59E0B' } },
+            { name: '预测维度', symbolSize: 50, itemStyle: { color: '#22C55E' }, label: { color: '#22C55E' } },
+            // 消费维度下的标签
+            { name: '消费内容', symbolSize: 35, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '电视消费水平', symbolSize: 35, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '宽带消费水平', symbolSize: 35, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '销售品名称', symbolSize: 35, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            // 业务维度下的标签
+            { name: '宽带产品带宽', symbolSize: 35, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '业务品牌', symbolSize: 35, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '电视入网程度', symbolSize: 35, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '宽带入网程度', symbolSize: 35, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            // 预测维度下的标签
+            { name: '用户是否挽留', symbolSize: 35, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } }
         ],
         links: [
-            { source: '用户标签', target: '基本特征' },
-            { source: '用户标签', target: '兴趣爱好' },
-            { source: '用户标签', target: '业务特征' },
-            { source: '用户标签', target: '社会特征' },
-            { source: '基本特征', target: '家庭地址' },
-            { source: '基本特征', target: '有无孩童' },
-            { source: '基本特征', target: '经济能力' },
-            { source: '兴趣爱好', target: '教育节目' },
-            { source: '兴趣爱好', target: '少儿节目' },
-            { source: '兴趣爱好', target: '娱乐节目' },
-            { source: '业务特征', target: '基础业务' },
-            { source: '业务特征', target: '网络业务' },
-            { source: '业务特征', target: '优惠偏好' },
-            { source: '社会特征', target: '生活习惯' },
-            { source: '社会特征', target: '购物圈' },
-            { source: '社会特征', target: '交友圈' }
+            { source: '用户画像', target: '消费维度' },
+            { source: '用户画像', target: '业务维度' },
+            { source: '用户画像', target: '预测维度' },
+            { source: '消费维度', target: '消费内容' },
+            { source: '消费维度', target: '电视消费水平' },
+            { source: '消费维度', target: '宽带消费水平' },
+            { source: '消费维度', target: '销售品名称' },
+            { source: '业务维度', target: '宽带产品带宽' },
+            { source: '业务维度', target: '业务品牌' },
+            { source: '业务维度', target: '电视入网程度' },
+            { source: '业务维度', target: '宽带入网程度' },
+            { source: '预测维度', target: '用户是否挽留' }
         ]
     }]
 };

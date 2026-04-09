@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <title>广电大数据实时监控大屏</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link rel="stylesheet" href="css/screen.css" th:href="@{/css/screen.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="js/jquery-2.2.3.min.js" th:src="@{/js/jquery-2.2.3.min.js}"></script>
+    <script src="js/echarts.min.js" th:src="@{/js/echarts.min.js}"></script>
+</head>
+<body class="screen-body">
+
+<!-- Header -->
+<div class="screen-header">
+    <a th:href="@{/}" style="position:absolute; left:24px; color:#22D3EE; text-decoration:none; border:1px solid rgba(34,211,238,0.3); padding:4px 14px; border-radius:6px; font-size:13px;">← 用户画像</a>
+    <h1>广电大数据实时监控大屏</h1>
+    <span class="header-time" id="headerTime"></span>
+</div>
+
+<!-- Main Grid -->
+<div class="screen-grid">
+
+    <!-- KPI Row -->
+    <div class="kpi-row">
+        <div class="s-kpi">
+            <div class="label">总订单数</div>
+            <div class="value" id="kpiOrders">--</div>
+            <div class="sub">累计订单</div>
+        </div>
+        <div class="s-kpi">
+            <div class="label">总营业额</div>
+            <div class="value" id="kpiCost">--</div>
+            <div class="sub">单位：元</div>
+        </div>
+        <div class="s-kpi">
+            <div class="label">有效订单</div>
+            <div class="value" id="kpiValid">--</div>
+            <div class="sub">过滤无效后</div>
+        </div>
+        <div class="s-kpi">
+            <div class="label">SVM 准确率</div>
+            <div class="value">79.25%</div>
+            <div class="sub">AUC: 0.8223</div>
+        </div>
+        <div class="s-kpi">
+            <div class="label">画像标签数</div>
+            <div class="value">9</div>
+            <div class="sub">消费/业务/预测</div>
+        </div>
+    </div>
+
+    <!-- Left Column -->
+    <div class="s-panel">
+        <div class="s-panel-header"><span><span class="dot"></span>标签用户分布</span><span class="badge">MySQL</span></div>
+        <div class="s-panel-body"><div class="s-chart" id="chartParent"></div></div>
+    </div>
+
+    <!-- Center Column -->
+    <div class="s-panel" style="grid-row: span 2;">
+        <div class="s-panel-header"><span><span class="dot"></span>订单趋势</span><span class="badge">Redis</span></div>
+        <div class="s-panel-body"><div class="s-chart" id="chartTrend"></div></div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="s-panel">
+        <div class="s-panel-header"><span><span class="dot"></span>消费水平分布</span><span class="badge">MySQL</span></div>
+        <div class="s-panel-body"><div class="s-chart" id="chartConsume"></div></div>
+    </div>
+
+    <!-- Bottom Left -->
+    <div class="s-panel">
+        <div class="s-panel-header"><span><span class="dot"></span>业务品牌占比</span><span class="badge">MySQL</span></div>
+        <div class="s-panel-body"><div class="s-chart" id="chartBrand"></div></div>
+    </div>
+
+    <!-- Bottom Right -->
+    <div class="s-panel">
+        <div class="s-panel-header"><span><span class="dot"></span>用户画像标签滚动</span><span class="badge">MySQL</span></div>
+        <div class="s-panel-body">
+            <div class="scroll-list" id="scrollList"></div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+var colors = {
+    blue: '#3B82F6', cyan: '#22D3EE', green: '#22C55E',
+    amber: '#F59E0B', red: '#EF4444', purple: '#A78BFA'
+};
+var darkAxis = { axisLine: { lineStyle: { color: '#1E293B' } }, splitLine: { lineStyle: { color: 'rgba(59,130,246,0.08)' } }, axisLabel: { color: '#64748B', fontSize: 11 } };
+
+// ===== Clock =====
+function updateTime() {
+    var now = new Date();
+    var s = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+    document.getElementById('headerTime').textContent = s;
+}
+updateTime(); setInterval(updateTime, 1000);
+
+// ===== Format number =====
+function fmt(n) { return Number(n).toLocaleString(); }
+function fmtMoney(n) { return '¥' + Number(n).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+// ===== Load Redis Realtime =====
+function loadRealtime() {
+    $.get('screen/realtime', function(d) {
+        document.getElementById('kpiOrders').textContent = fmt(d.totalOrders || 0);
+        document.getElementById('kpiCost').textContent = fmtMoney(d.totalcost || 0);
+        document.getElementById('kpiValid').textContent = fmt(d.totalValidOrders || 0);
+
+        // Trend chart
+        var hourly = d.hourly || [];
+        if (hourly.length > 0) {
+            var hours = hourly.map(function(h){ return h.hour; });
+            var orders = hourly.map(function(h){ return Number(h.orders); });
+            var costs = hourly.map(function(h){ return Number(h.cost); });
+            var trendChart = echarts.init(document.getElementById('chartTrend'));
+            trendChart.setOption({
+                backgroundColor: 'transparent',
+                tooltip: { trigger: 'axis' },
+                legend: { data: ['订单数','营业额'], textStyle: { color: '#94A3B8', fontSize: 11 }, top: 5 },
+                grid: { top: 40, bottom: 30, left: 50, right: 50 },
+                xAxis: { type: 'category', data: hours, axisLine: darkAxis.axisLine, axisLabel: darkAxis.axisLabel },
+                yAxis: [
+                    { type: 'value', name: '订单', nameTextStyle: { color: '#64748B' }, splitLine: darkAxis.splitLine, axisLabel: darkAxis.axisLabel },
+                    { type: 'value', name: '营业额', nameTextStyle: { color: '#64748B' }, splitLine: { show: false }, axisLabel: darkAxis.axisLabel }
+                ],
+                series: [
+                    { name: '订单数', type: 'bar', data: orders, itemStyle: { color: colors.blue }, barWidth: 20 },
+                    { name: '营业额', type: 'line', yAxisIndex: 1, data: costs, itemStyle: { color: colors.cyan }, lineStyle: { width: 2 }, smooth: true, areaStyle: { color: 'rgba(34,211,238,0.08)' } }
+                ]
+            });
+            window.addEventListener('resize', function(){ trendChart.resize(); });
+        }
+    });
+}
+
+// ===== Load Label Stats =====
+function loadLabelStats() {
+    $.get('screen/label-stats', function(data) {
+        var parentMap = {};
+        data.forEach(function(row) {
+            var p = row.parent_label;
+            if (!parentMap[p]) parentMap[p] = [];
+            parentMap[p].push({ name: row.label, value: Number(row.cnt) });
+        });
+
+        // 消费水平饼图（电视消费水平）
+        var consumeData = parentMap['电视消费水平'] || [];
+        var consumeChart = echarts.init(document.getElementById('chartConsume'));
+        consumeChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            series: [{
+                type: 'pie', radius: ['35%','65%'], center: ['50%','55%'],
+                data: consumeData,
+                label: { color: '#94A3B8', fontSize: 11 },
+                itemStyle: { borderColor: '#0a0e27', borderWidth: 2 },
+                color: [colors.blue, colors.cyan, colors.green, colors.amber]
+            }]
+        });
+
+        // 业务品牌饼图
+        var brandData = parentMap['业务品牌'] || [];
+        var brandChart = echarts.init(document.getElementById('chartBrand'));
+        brandChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            series: [{
+                type: 'pie', radius: ['35%','65%'], center: ['50%','55%'],
+                data: brandData,
+                label: { color: '#94A3B8', fontSize: 11 },
+                itemStyle: { borderColor: '#0a0e27', borderWidth: 2 },
+                color: [colors.amber, colors.purple, colors.cyan, colors.green, colors.red]
+            }]
+        });
+
+        // 滚动列表
+        var listHtml = '';
+        data.slice(0, 30).forEach(function(row) {
+            listHtml += '<div class="scroll-item"><span class="tag">' + row.parent_label + '</span><span class="val">' + row.label + '</span><span class="phone">' + fmt(row.cnt) + '人</span></div>';
+        });
+        // duplicate for infinite scroll
+        document.getElementById('scrollList').innerHTML = '<div class="scroll-list-inner">' + listHtml + listHtml + '</div>';
+
+        window.addEventListener('resize', function(){ consumeChart.resize(); brandChart.resize(); });
+    });
+}
+
+// ===== Load Parent Stats (bar chart) =====
+function loadParentStats() {
+    $.get('screen/parent-stats', function(data) {
+        var names = data.map(function(r){ return r.parent_label; });
+        var values = data.map(function(r){ return Number(r.cnt); });
+        var barColors = [colors.blue, colors.cyan, colors.green, colors.amber, colors.purple, colors.red, colors.blue, colors.cyan, colors.green];
+        var colorData = values.map(function(v, i){ return barColors[i % barColors.length]; });
+
+        var parentChart = echarts.init(document.getElementById('chartParent'));
+        parentChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'axis' },
+            grid: { top: 10, bottom: 5, left: 10, right: 30, containLabel: true },
+            xAxis: { type: 'value', splitLine: darkAxis.splitLine, axisLabel: darkAxis.axisLabel },
+            yAxis: { type: 'category', data: names.reverse(), axisLabel: { color: '#94A3B8', fontSize: 11 }, axisLine: darkAxis.axisLine },
+            series: [{
+                type: 'bar',
+                data: values.reverse().map(function(v, i){ return { value: v, itemStyle: { color: barColors[i % barColors.length] } }; }),
+                barWidth: 16,
+                label: { show: true, position: 'right', color: '#94A3B8', fontSize: 11, formatter: function(p){ return fmt(p.value); } }
+            }]
+        });
+        window.addEventListener('resize', function(){ parentChart.resize(); });
+    });
+}
+
+// ===== Init =====
+$(function() {
+    loadRealtime();
+    loadLabelStats();
+    loadParentStats();
+    // Auto refresh realtime data every 10s
+    setInterval(loadRealtime, 10000);
+});
+</script>
+</body>
+</html>

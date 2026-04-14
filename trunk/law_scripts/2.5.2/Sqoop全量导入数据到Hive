@@ -1,2 +1,0 @@
-//Sqoop全量导入数据到Hive
-sqoop --import --connect jdbc:mysql://node1:3306/law --username root --password root --table law_visit_log_all --direct --hive-import --hive-database law --hive-table law_visit_log_all --driver com.mysql.jdbc.Driver --m 20 --split-by userid

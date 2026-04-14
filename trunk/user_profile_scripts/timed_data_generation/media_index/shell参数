@@ -1,4 +1,0 @@
-shell参数列表：
-2018-10-10 create_media_1d.hql 2018-05-02 server3  /root/qwm/zjsm.jar 192.168.111.85 9200 origin_time media_index media
-cron表达式：
-0 10 1 * * ? *

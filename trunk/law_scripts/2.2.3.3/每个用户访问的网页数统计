@@ -1,6 +1,0 @@
-val fullurlid="fullurlid"
-val data=sqlContext.read.table("law.law_visit_log_all")
-val userNum=data.select(userid).distinct().count()
-val data2=data.groupBy(userid).agg(countDistinct(fullurlid) as "fcount").groupBy("fcount").agg(count(userid) as "ucount",count(userid)*100.0/userNum as "user_per").orderBy(desc("ucount"))
-data2.show(false)
-

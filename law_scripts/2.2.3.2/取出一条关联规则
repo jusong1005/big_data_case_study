@@ -1,0 +1,8 @@
+
+// 在代码 FP-growth算法构建模型示例代码之后运行
+scala> model.generateAssociationRules(minConfidence).sortBy(x => -x.confidence).take(30).filter(rule => rule.antecedent.mkString(",").contains("7774252")).foreach { rule =>
+     |   println(
+     |     rule.antecedent.mkString("[", ",", "]")
+     |       + " => " + rule.consequent .mkString("[", ",", "]")
+     |       + ", " + rule.confidence)
+     | }

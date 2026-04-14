@@ -1,0 +1,18 @@
+import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.feature.StandardScaler
+val assembled_features = "assembled_features"
+val scaled_features = "scaled_features"
+def assemble(data:DataFrame) :DataFrame= {
+ val assembler = new VectorAssembler().setInputCols(Array(visit_duration,visit_count,visit_relevant_count)).setOutputCol(assembled_features)
+  val assemble_features_label = assembler.transform(data)
+  assemble_features_label
+}
+def scale(data:DataFrame):DataFrame = {
+    val scaler = new StandardScaler().setInputCol(assembled_features).setOutputCol(scaled_features).setWithStd(true).setWithMean(false)
+    val scalerModel = scaler.fit(data)
+    val scaledData = scalerModel.transform(data)
+    scaledData
+  }
+val assembled_data = assemble(filtered_data)
+val scaled_data = scale(assembled_data)
+scaled_data.show(false)

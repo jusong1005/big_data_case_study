@@ -1,0 +1,97 @@
+导入数据到MYSQL库law_init中的表lawtime_all后，通过一个Shell脚本将lawtime_all表中的数据一天天导入另一个MYSQL中的表。
+
+第一步：新建一个MYSQL表，用于存放导入的数据。
+新建一个MYSQL表，这个表必须具有law_init.lawtime_all这个表的所有字段，才能用来存放获取的数据，
+另外，在这个结构的基础上，增加3个新的字段，
+第一个字段id，这是一个自增长字段，主键，主要是记录数据量，并且在后面会有其他用处；
+第2个字段timestampsNow，记录数据导入新表的时间戳，长整型类型；
+第3个字段timestamp_format_now，记录数据导入新表的具体日期，字符串类型。
+create table lawtime_reality(
+id bigint auto_increment,
+realIP varchar(12),
+realAreacode int,
+userAgent varchar(100),
+userOS varchar(50),
+userID varchar(100),
+clientID varchar(100),
+timestamps bigint,
+timestamp_format varchar(30),
+pagePath varchar(200),
+ymd int,
+fullURL varchar(255),
+fullURLID varchar(20),
+hostname varchar(100),
+pageTitle varchar(500),
+pageTitleCategoryId int,
+pageTitleCategoryName varchar(100),
+pageTitleKw varchar(100),
+fullReferrrer varchar(100),
+FullReferrerURL varchar(500),
+organicKeyword varchar(300),
+source varchar(100),
+timestampsNow bigint,
+timestamp_format_now varchar(30),
+primary key (id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+第二步：写一个Shell脚本，这个shell脚本的功能是可以将一天的数据取出并导入另一个MYSQL表。
+Shell脚本的功能是计算当前日期前一天与设定脚本运行初始日期间的天数差，
+然后在数据库中找到与数据第一天相差天数相同的日期，导入该日期对应的一整天的数据到lawtime_reality中。
+#!/bin/bash
+## import data from origin table :lawtime_all to reality table : lawtime_reality;
+## run this program every day on 00:10 AM .
+usage="Usage: ./import_to_reality.sh <program_start_ymd> <database> <origin_table> <reality_table> <log_file>"
+# program_start_ymd:  the program start time , yyyyMMdd;
+# if no args specified, show usage
+if [ $# != 5 ]; then
+  echo $usage
+  exit 1
+fi
+program_start_ymd=$1
+db=$2
+origin_table=$3
+reality_table=$4
+log_file=$5
+start_time=$(date +%Y-%m-%d-%H:%M:%S)
+echo -e "\nstart time : $start_time" >> $log_file
+echo "program run day: $program_start_ymd" >> $log_file
+start_time=$(date +%s)
+## functions
+# your code here
+data_start_ymd=20140819 # do not change this value, because run this in 00:10 am ,so add 1 to this value ,real value is 20140819
+#data_start_ymd_before1=20140818 # do not change this value
+curr_ymd=$(date +%Y%m%d)
+time_curr_ymd=$(date -d $curr_ymd +%s)
+time_program_start_ymd=$(date -d $program_start_ymd +%s)
+time_curr_program_interval=`expr $time_curr_ymd - $time_program_start_ymd`
+time_before1_curr=`expr $time_curr_ymd - 86400` # before current day
+time_before1_curr_ymd=$(date -d @$time_before1_curr +%Y-%m-%d)
+#echo "$time_curr_ymd , $time_program_start_ymd , $time_curr_program_interval "
+time_data_start_ymd=$(date -d $data_start_ymd +%s)
+time_where_end=`expr $time_data_start_ymd + $time_curr_program_interval`
+time_where_end_ymd=$(date -d @$time_where_end +%Y-%m-%d)
+#echo "$time_where_end , $time_where_end_ymd , $time_curr_program_interval "
+#time_data_start_ymd_before1=$(date -d $data_start_ymd_before1 +%s)
+#time_where_start=`expr $time_data_start_ymd_before1 + $time_curr_program_interval`
+#time_where_start_ymd=$(date -d @$time_where_start +%Y-%m-%d)
+sql="use $db; insert into $reality_table (realIP,realAreacode,userAgent,userOS,userID,clientID,timestamps,timestamp_format,pagePath,ymd,fullURL,fullURLID,hostname,pageTitle,pageTitleCategoryId,pageTitleCategoryName,pageTitleKw,fullReferrrer,FullReferrerURL,organicKeyword,source,timestamp_format_now)  select * , concat('$time_before1_curr_ymd ',substring(timestamp_format,12,8)) as timestamp_format_now from $origin_table where timestamp_format >= '$time_where_end_ymd 00:00:00' and timestamp_format <= '$time_where_end_ymd 23:59:59';"
+echo "sql: $sql" >> $log_file
+#mysql -uroot -proot -e "use ${db};source ${input}/$i;"
+mysql -uroot -proot -h node1 -e "$sql"
+end_time=$(date +%Y-%m-%d-%H:%M:%S)
+echo "end time : $end_time" >> $log_file
+end_time=$(date +%s)
+cost_time=$(($end_time - $start_time))
+echo -e "cost time: $cost_time seconds \n" >> $log_file
+
+第三步：运行第二步的脚本需要输入5个参数，分别是初次运行脚本的日期、数据库名、原数据表名、导入数据的数据表名、记录日志的文件名。
+将运行Shell脚本import_to_reality.sh的命令写入一个文件，代码如下。
+#!/bin/bash
+echo "run this scripts ..."
+/root/ring/import_to_reality.sh 20180828 law_init lawtime_all lawtime_reality /root/ring/import_log.txt
+
+第四步：增加一个定时任务，定时任务会在每天的同一时间执行第三步的Shell脚本。
+首先在要执行脚本的节点输入命令“crontab -e”，在打开的文件中加入命令“10 0 * * * /root/ring/from_lawtime_import_to_reality.sh >> /root/ring/a_log.txt”，
+只要机器不关闭，每天凌晨0点10分的时候，就会计算当前日期前一天与初次运行日期的天数差，
+将lawtime_all中与开始日期相差同样天数的当天数据导入lawtime_reality。
+

@@ -1,2 +1,0 @@
-scala> sqlContext.sql("select  count(distinct(userid)) as usercount from law.law_visit_log_all_cleaned").show()
-scala>sqlContext.sql("select  count(distinct(userid)) as usercount from law.law_visit_log_all_cleaned where fullurl like '%askSuccess%' ").show()

@@ -1,0 +1,7 @@
+use law;
+create table law_visit_log_als_recommends(
+userid varchar(20),
+fullurl varchar(200),
+rating double,
+index(userid)
+);

@@ -1,0 +1,28 @@
+import org.apache.spark.ml.classification.{RandomForestClassificationModel, RandomForestClassifier}
+import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.mllib.evaluation.MulticlassMetrics
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.functions._
+import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
+import org.apache.spark.ml.{Pipeline,PipelineModel}
+/**
+  * 随机森林
+  */
+val indexedLabel="indexedLabel"
+val indexedFeatures="indexedFeatures"
+val predictedLabel="predictedLabel"
+val predict_column = "predict_column"
+def create_model(data: DataFrame) = {
+    val labelIndexer = new StringIndexer().setInputCol(label).setOutputCol(indexedLabel).fit(data)
+    val featureIndexer = new VectorIndexer().setInputCol(scaled_features).setOutputCol(indexedFeatures).setMaxCategories(4).fit(data)
+    val rf = new RandomForestClassifier().setLabelCol(indexedLabel).setFeaturesCol(indexedFeatures).setNumTrees(10).setPredictionCol(predict_column)
+    val labelConverter = new IndexToString().setInputCol(predict_column).setOutputCol(predictedLabel).setLabels(labelIndexer.labels)
+    val pipeline = new Pipeline().setStages(Array(labelIndexer, featureIndexer, rf, labelConverter))
+    val model = pipeline.fit(data)
+    model
+  }
+val model = create_model(scaled_data)
+val predictions=model.transform(scaled_data)
+predictions.select(predictedLabel, label, scaled_features).show(5)

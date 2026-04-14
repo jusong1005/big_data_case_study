@@ -1,4 +1,0 @@
-1.解压logstash-6.3.2.tar.即可使用
-2.使用logstash导入文件到elasticsearch命令：logstash -f 配置文件。
-example:
-nohup ./logstash-6.3.2/bin/logstash -f media1.conf >> /var/log/logstash.log 2>&1 &

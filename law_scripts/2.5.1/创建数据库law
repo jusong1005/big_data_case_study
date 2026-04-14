@@ -1,0 +1,5 @@
+//创建MySQL数据库law
+drop database if exists law;
+create database law;
+use law;
+

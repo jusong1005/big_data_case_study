@@ -1,0 +1,12 @@
+val userid="userid"
+val fullurlid="fullurlid"
+val fullurl="fullurl"
+val data=sqlContext.sql("select * from law.law_visit_log_all_cleaned ")
+val users_all= data.select(userid).distinct()
+val users=data.filter("fullurl like '%askSuccess%'").select(userid).distinct()
+val data_ask=data.join(users,userid)
+val user_law = data_ask.filter("fullurl like '%lawyer%' or (fullurl like '%lawfirm%') or (fullurl like '%interview%') or (fullurl like '%mylawyer%')").select(userid).distinct()
+val user_law_all = data.filter("fullurl like '%lawyer%' or (fullurl like '%lawfirm%') or (fullurl like '%interview%') or (fullurl like '%mylawyer%')").select(userid).distinct()
+
+println("发布了咨询的用户浏览律师界面的概率："+user_law.count()*100.0/users.count()+"%")
+println("浏览律师界面用户占总用户的比例："+user_law_all.count()*100.0/users_all.count()+"%")

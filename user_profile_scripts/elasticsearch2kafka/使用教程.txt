@@ -1,0 +1,4 @@
+1.创建kafka topic "order"
+kafka-topics --create --zookeeper node3:2181 --replication-factor 3 --partitions 3 --topic order
+2.使用order_kafka.conf启动logstash
+nohup ./logstash-6.3.2/bin/logstash -f order_kafka.conf >> /var/log/logstash.log 2>&1 &

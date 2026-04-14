@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <title>广电大数据用户画像平台</title>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link rel="stylesheet" href="static/css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="static/js/jquery-2.2.3.min.js"></script>
+    <script src="static/js/echarts.min.js"></script>
+</head>
+<body>
+<!-- Top Nav -->
+<nav class="top-nav">
+    <div class="logo">
+        <div class="logo-icon">BD</div>
+        <span class="logo-text">广电大数据用户画像平台</span>
+    </div>
+    <div class="nav-info">
+        <span><span class="status-dot"></span>系统运行中</span>
+        <span id="currentTime"></span>
+    </div>
+</nav>
+
+<div class="dashboard-container">
+    <!-- KPI Cards -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(3, 1fr);">
+        <div class="kpi-card">
+            <div class="kpi-label">用户总量</div>
+            <div class="kpi-value">2,463,779</div>
+            <div class="kpi-sub">广州地区广电用户</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">画像标签数</div>
+            <div class="kpi-value">9</div>
+            <div class="kpi-sub">消费 / 行为 / 预测</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-label">SVM 模型准确率</div>
+            <div class="kpi-value">79.25%</div>
+            <div class="kpi-sub">AUC: 0.8223</div>
+        </div>
+    </div>
+
+    <!-- Search -->
+    <div class="search-section">
+        <div class="search-card">
+            <h3>用户画像查询</h3>
+            <div class="search-row">
+                <input class="search-input" value="2463779" placeholder="请输入用户 ID（如 2463779）" />
+                <button class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                    用户画像
+                </button>
+                <button class="btn btn-secondary">标签详情</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid-2">
+        <!-- Left: Chart -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span class="dot"></span>用户标签知识图谱</div>
+                <span class="card-badge">ECharts</span>
+            </div>
+            <div class="card-body">
+                <div id="labelGraph" class="chart-container"></div>
+            </div>
+        </div>
+
+        <!-- Right: Profile -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><span class="dot"></span>用户画像结果</div>
+                <span class="card-badge">已加载</span>
+            </div>
+            <div class="profile-header">
+                <div class="profile-avatar">U</div>
+                <div class="profile-info">
+                    <h3>用户 2463779</h3>
+                    <p>广电宽带/电视用户</p>
+                </div>
+            </div>
+            <div class="tag-groups">
+                <div class="tag-group">
+                    <div class="tag-group-title">消费内容</div>
+                    <div class="tag-list">
+                        <span class="tag">电视</span>
+                        <span class="tag">宽带</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">电视消费水平</div>
+                    <div class="tag-list">
+                        <span class="tag">中</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">宽带消费水平</div>
+                    <div class="tag-list">
+                        <span class="tag">低</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">宽带产品带宽</div>
+                    <div class="tag-list">
+                        <span class="tag">100M</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">用户是否挽留</div>
+                    <div class="tag-list">
+                        <span class="tag">是</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">业务品牌</div>
+                    <div class="tag-list">
+                        <span class="tag">高清互动</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">电视入网程度</div>
+                    <div class="tag-list">
+                        <span class="tag">深度</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">宽带入网程度</div>
+                    <div class="tag-list">
+                        <span class="tag">中度</span>
+                    </div>
+                </div>
+                <div class="tag-group">
+                    <div class="tag-group-title">销售品名称</div>
+                    <div class="tag-list">
+                        <span class="tag">畅享包</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ECharts
+var labelGraph = echarts.init(document.getElementById('labelGraph'));
+var graphOption = {
+    backgroundColor: 'transparent',
+    animationDuration: 1500,
+    animationEasingUpdate: 'quinticInOut',
+    series: [{
+        type: 'graph', layout: 'force', roam: true, draggable: true, focusNodeAdjacency: true,
+        force: { repulsion: 200, gravity: 0.05, edgeLength: [60, 120], layoutAnimation: true },
+        label: { show: true, fontSize: 12, color: '#F8FAFC', fontWeight: 'bold' },
+        lineStyle: { color: '#334155', width: 1.5, curveness: 0.15, opacity: 0.6 },
+        emphasis: { lineStyle: { width: 3, color: '#3B82F6' }, label: { fontSize: 14 } },
+        edgeSymbol: ['none', 'arrow'], edgeSymbolSize: [0, 6],
+        data: [
+            { name: '用户标签', symbolSize: 70, label: { color: '#fff', position: 'inside', fontSize: 14 }, itemStyle: { color: { type: 'radial', x:0.5,y:0.5,r:0.5, colorStops: [{offset:0,color:'#3B82F6'},{offset:1,color:'#1E40AF'}]}, shadowBlur: 20, shadowColor: 'rgba(59,130,246,0.5)' } },
+            { name: '基本特征', symbolSize: 50, itemStyle: { color: '#22D3EE' }, label: { color: '#22D3EE' } },
+            { name: '兴趣爱好', symbolSize: 50, itemStyle: { color: '#22C55E' }, label: { color: '#22C55E' } },
+            { name: '业务特征', symbolSize: 50, itemStyle: { color: '#F59E0B' }, label: { color: '#F59E0B' } },
+            { name: '社会特征', symbolSize: 50, itemStyle: { color: '#A78BFA' }, label: { color: '#A78BFA' } },
+            { name: '家庭地址', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '有无孩童', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '经济能力', symbolSize: 32, itemStyle: { color: '#0E7490' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '教育节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '少儿节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '娱乐节目', symbolSize: 32, itemStyle: { color: '#166534' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '基础业务', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '网络业务', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '优惠偏好', symbolSize: 32, itemStyle: { color: '#92400E' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '生活习惯', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '购物圈', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } },
+            { name: '交友圈', symbolSize: 32, itemStyle: { color: '#5B21B6' }, label: { fontSize: 11, color: '#94A3B8' } }
+        ],
+        links: [
+            { source: '用户标签', target: '基本特征' }, { source: '用户标签', target: '兴趣爱好' },
+            { source: '用户标签', target: '业务特征' }, { source: '用户标签', target: '社会特征' },
+            { source: '基本特征', target: '家庭地址' }, { source: '基本特征', target: '有无孩童' },
+            { source: '基本特征', target: '经济能力' }, { source: '兴趣爱好', target: '教育节目' },
+            { source: '兴趣爱好', target: '少儿节目' }, { source: '兴趣爱好', target: '娱乐节目' },
+            { source: '业务特征', target: '基础业务' }, { source: '业务特征', target: '网络业务' },
+            { source: '业务特征', target: '优惠偏好' }, { source: '社会特征', target: '生活习惯' },
+            { source: '社会特征', target: '购物圈' }, { source: '社会特征', target: '交友圈' }
+        ]
+    }]
+};
+labelGraph.setOption(graphOption);
+window.addEventListener('resize', function() { labelGraph.resize(); });
+
+// Clock
+function updateTime() {
+    var now = new Date();
+    var str = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0')+' '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+    var el = document.getElementById('currentTime');
+    if(el) el.textContent = str;
+}
+updateTime(); setInterval(updateTime, 1000);
+</script>
+</body>
+</html>

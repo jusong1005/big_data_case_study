@@ -1,0 +1,45 @@
+// 设置参数
+ val uidCol = "userid"
+
+ val timeCol = "timestamp_format"
+
+ import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions._
+ val interval_count = "interval_count"
+ val interval_count_percent = "interval_count_percent"
+ val time_interval = "time_interval"
+ import java.text.SimpleDateFormat
+import java.text.SimpleDateFormat
+ val validate = valid_data
+ val simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+// 定义获取间隔函数
+ val getInterval = udf{(times:Seq[String]) =>
+     |   val times_sorted = times.sorted
+     |   (simpleDateFormat.parse(times_sorted.apply(1)).getTime - simpleDateFormat.parse(times_sorted.apply(0)).getTime)/1000
+     | }
+
+ val first_filtered = validate.select(uidCol,timeCol).groupBy(uidCol).agg(collect_list(timeCol) as time_interval).filter(size(col(time_interval)) > 1 ).withColumn(time_interval,getInterval(col(time_interval)))
+
+second_filtered: org.apache.spark.sql.DataFrame = [userid: string, time_interval: bigint]
+// 统计访问间隔累计数据用户占比
+ (1 to 30).map(x => (x, (second_filtered.filter(time_interval +" <= "+ x * 60).count()*100.0/valid_count).formatted("%.2f") + "% ")).foreach(println(_))
+(1,29.90% )                                                                     
+(2,41.65% )
+(3,48.37% )
+(4,53.11% )
+(5,56.65% )
+(6,59.47% )
+(7,61.74% )
+…
+(30,81.42% )
+//统计访问间隔数据用户占比
+ (1 to 29).zip(2 to 30).map(x => (x._1+"~"+x._2, (second_filtered.filter(time_interval +" < "+ x._2 * 60 +" and " + time_interval +" >= " + x._1 * 60 ).count()*100.0/valid_count).formatted("%.2f") + "% ")).foreach(println(_))
+(1~2,11.90% )                                                                   
+(2~3,6.77% )
+(3~4,4.77% )
+(4~5,3.56% )
+(5~6,2.83% )
+(6~7,2.28% )
+(7~8,1.93% )
+…
+(29~30,0.46% )

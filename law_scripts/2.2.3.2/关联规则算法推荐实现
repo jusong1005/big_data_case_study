@@ -1,0 +1,76 @@
+import org.apache.spark.mllib.fpm.AssociationRules.Rule
+import org.apache.spark.mllib.fpm.{AssociationRules, FPGrowth}
+import org.apache.spark.rdd.RDD
+import scala.collection.mutable.ArrayBuffer
+//  加载数据
+val train_data = sqlContext.sql("select * from law.law_visit_log_all_cleaned_101003_fp_train")
+
+// 去重，并过滤掉访问网页数不足2的记录数
+val filtered_data = train_data.select("userid", "fullurl").distinct.groupBy("userid").agg(collect_set(col("fullurl")) as "url_sets").filter(size(col("url_sets")) > 1)
+
+// 转换格式，使模型可直接使用
+val trainData = filtered_data.select("url_sets").rdd.map(row => row.getSeq[String](0)).map(x => x.toArray)
+
+// 构建FP-Growth 模型
+val fpg = new FPGrowth().setMinSupport(0.00001)
+
+// 执行建模，得到模型
+trainData.cache
+val model = fpg.run(trainData)
+
+// 输出关联规则
+val minConfidence = 0.3
+val rules :RDD[AssociationRules.Rule[String]] = model.generateAssociationRules(minConfidence)
+
+
+// 先按 antecedent.length降序，后按 confidence降序排列
+val length_confidence = new Ordering[AssociationRules.Rule[String]] {
+    override def compare(x: Rule[String], y: Rule[String]): Int = if (x.antecedent.length != y.antecedent.length) {
+      y.antecedent.length - x.antecedent.length
+    } else {
+      if (-x.confidence + y.confidence > 0) {
+        1
+      } else if (x.confidence == y.confidence) {
+        0
+      } else {
+        -1
+      }
+    }
+  }
+
+// 推荐单个访问集
+def getRecommend(visited: Seq[String], rules_ordered: Array[Rule[String]], recNum: Int):(Seq[String], Array[(String, Double)])  = {
+    val buff = new ArrayBuffer[(String, Double)]()
+    val visited_set = visited.toSet
+    for (rule <- rules_ordered) {
+      if (visited_set.size >= rule.antecedent.length) {
+        // 不是对应位置，则跳过
+        if (visited_set.&(rule.antecedent.toSet).size == rule.antecedent.size) {
+          // 最佳匹配
+          for (recItem <- rule.consequent) {
+            buff.append((recItem, rule.confidence))
+            if (buff.length >= recNum) {
+              return (visited, buff.toArray)
+            }
+          }
+        }
+      }
+    }
+    (visited,buff.toArray)
+  }
+
+// 得到推荐
+def getWithRecommend(rules_origin: RDD[AssociationRules.Rule[String]], validate_for_test: RDD[Seq[String]], recNum: Int)
+  : RDD[(Seq[String], Array[(String, Double)])] = {
+    // 1. 规则排序
+    val antecedent_length_count = rules_origin.map(x => (x.antecedent.length, 1)).reduceByKey((x, y) => x + y).collect().sortBy(x => -x._1)
+    val rules_ordered = rules_origin.collect().sorted(length_confidence) // 排过序的规则；
+    validate_for_test.map(visited => getRecommend(visited, rules_ordered,recNum))
+}
+
+// 模拟测试集
+val validate_for_test = sc.parallelize(List(Seq("http://www.xxx.cn/ask/question_2766570.html","http://www.xxx.cn/ask/question_4032958.html")))
+
+// 进行推荐
+getWithRecommend(rules, validate_for_test, 3).collect.foreach(x => println(x + x._2.mkString("|")))
+(List(http://www.xxx.cn/ask/question_2766570.html, http://www.xxx.cn/ask/question_4032958.html),[Lscala.Tuple2;@544723bc)(http://www.xxx.cn/ask/question_1736330.html,0.7887323943661971)|(http://www.xxx.cn/ask/question_4432634.html,0.7183098591549296)|(http://www.xxx.cn/ask/question_3294390.html,0.6197183098591549)

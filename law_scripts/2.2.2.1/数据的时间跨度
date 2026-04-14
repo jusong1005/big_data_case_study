@@ -1,0 +1,11 @@
+scala> val data = sqlContext.sql("select * from law.law_visit_log_all")
+//统计数据的最新、最早时间
+scala> data.select(max("ymd") as "max_ymd",min("ymd") as "min_ymd").show()
++--------+--------+
+| max_ymd| min_ymd|
++--------+--------+
+|20171031|20170819|
++--------+--------+
+//统计数据的时间跨度
+scala> data.select("ymd").distinct.count
+res3: Long = 74

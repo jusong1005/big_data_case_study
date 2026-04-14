@@ -1,0 +1,12 @@
+//  加载数据，并去重
+val data = sqlContext.sql("select * from law.law_visit_log_all_cleaned_101003").select("userid","fullurl","timestamp_format").distinct
+
+// 计算时间分割点
+val num = data.count
+val split_point = (num * 0.8).toInt
+val split_time = data.select("timestamp_format").orderBy("timestamp_format").rdd.map(row => row.getString(0)).zipWithIndex.filter(x => x._2 == split_point).collect.apply(0)
+
+// 分别并存储训练、验证集
+data.filter("timestamp_format < '"+split_time._1+"'").write.mode("overwrite").saveAsTable("law.law_visit_log_all_cleaned_101003_fp_train")
+data.filter("timestamp_format >= '"+split_time._1+"'").write.mode("overwrite").saveAsTable("law.law_visit_log_all_cleaned_101003_fp_validate")
+

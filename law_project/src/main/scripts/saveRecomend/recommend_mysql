@@ -1,0 +1,20 @@
+use law_init;
+drop table if exists law_recommend;
+create table law_recommend(
+userid varchar(20) primary key,
+rec1 varchar(200),
+rec2 varchar(200),
+rec3 varchar(200),
+rec4 varchar(200),
+rec5 varchar(200),
+rec6 varchar(200),
+rec7 varchar(200),
+rec8 varchar(200),
+rec9 varchar(200),
+rec10 varchar(200)
+);
+
+
+
+//hive导入数据到mysql
+sqoop export --connect jdbc:mysql://192.168.2.162:3306/law_init --username root --password 123456 --table law_recommend --export-dir /user/hive/warehouse/law_init/law_recommend

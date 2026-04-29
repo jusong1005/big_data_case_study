@@ -1,7 +1,7 @@
 package com.tipdm.entity;
 
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 /**

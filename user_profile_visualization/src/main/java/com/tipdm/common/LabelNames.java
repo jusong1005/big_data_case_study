@@ -9,7 +9,7 @@ import java.util.List;
  * Created by ch on 2018/11/5
  */
 @Component
-@ConfigurationProperties(prefix = "labelName")
+@ConfigurationProperties(prefix = "label-name")
 public class LabelNames {
     private List<String> labelNames;
 

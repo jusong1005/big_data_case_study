@@ -6,7 +6,6 @@ import com.tipdm.entity.UserLabel;
 import com.tipdm.repository.UserLabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +16,6 @@ import java.util.*;
  */
 @Service
 @Transactional
-@PropertySource("classpath:application.yml")
 public class UserLabelService {
     @Autowired
     private UserLabelRepository userLabelRepository;

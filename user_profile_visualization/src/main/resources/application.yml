@@ -7,8 +7,8 @@ spring:
 number: 6
 
 #用户画像显示二级标签名称
-labelName:
-  labelNames:
+label-name:
+  label-names:
     - "消费内容"
     - "电视消费水平"
     - "宽带消费水平"

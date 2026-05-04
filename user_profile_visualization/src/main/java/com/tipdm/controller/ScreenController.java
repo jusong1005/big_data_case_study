@@ -70,4 +70,25 @@ public class ScreenController {
         String sql = "SELECT parent_label, COUNT(*) as cnt FROM user_label GROUP BY parent_label ORDER BY cnt DESC";
         return jdbcTemplate.queryForList(sql);
     }
+
+    @GetMapping("/model-metrics")
+    public Map<String, Object> getModelMetrics() {
+        String sql = "SELECT param_original, value FROM user_profile_svm_metrics ORDER BY param_original";
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
+        Map<String, Object> metrics = new LinkedHashMap<>();
+        for (Map<String, Object> row : rows) {
+            metrics.put(String.valueOf(row.get("param_original")), row.get("value"));
+        }
+        return metrics;
+    }
+
+    @GetMapping("/summary")
+    public Map<String, Object> getSummary() {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalUsers", jdbcTemplate.queryForObject("SELECT COUNT(DISTINCT phone_no) FROM user_label", Long.class));
+        summary.put("totalLabels", jdbcTemplate.queryForObject("SELECT COUNT(*) FROM user_label", Long.class));
+        summary.put("labelCategoryCount", jdbcTemplate.queryForObject("SELECT COUNT(DISTINCT parent_label) FROM user_label", Long.class));
+        summary.put("metrics", getModelMetrics());
+        return summary;
+    }
 }

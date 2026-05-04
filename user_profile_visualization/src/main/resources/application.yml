@@ -4,7 +4,7 @@ spring:
       active: dev
 
 #用户画像页面二级标签显示个数
-number: 6
+number: 9
 
 #用户画像显示二级标签名称
 label-name:

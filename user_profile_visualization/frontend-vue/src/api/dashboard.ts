@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { ApiResult, LabelStat, ParentStat, RealtimeData, UserLabel, UserProfileData } from '@/types/dashboard';
+import type { ApiResult, LabelStat, ModelMetrics, ParentStat, RealtimeData, ScreenSummary, UserLabel, UserProfileData } from '@/types/dashboard';
 
 export async function fetchSampleUsers() {
   const { data } = await apiClient.get<number[]>('/labels/samples');
@@ -28,5 +28,15 @@ export async function fetchLabelStats() {
 
 export async function fetchParentStats() {
   const { data } = await apiClient.get<ParentStat[]>('/screen/parent-stats');
+  return data;
+}
+
+export async function fetchModelMetrics() {
+  const { data } = await apiClient.get<ModelMetrics>('/screen/model-metrics');
+  return data;
+}
+
+export async function fetchScreenSummary() {
+  const { data } = await apiClient.get<ScreenSummary>('/screen/summary');
   return data;
 }

@@ -15,18 +15,18 @@
     <section class="metric-grid">
       <article class="metric-card">
         <span>用户总量</span>
-        <strong>2,463,779</strong>
-        <small>广州地区广电用户</small>
+        <strong>{{ formatNumber(summary?.totalUsers) }}</strong>
+        <small>当前画像用户</small>
       </article>
       <article class="metric-card">
         <span>画像标签数</span>
-        <strong>9</strong>
-        <small>消费 / 业务 / 预测</small>
+        <strong>{{ formatNumber(summary?.labelCategoryCount) }}</strong>
+        <small>{{ formatNumber(summary?.totalLabels) }} 条标签</small>
       </article>
       <article class="metric-card">
         <span>SVM 模型准确率</span>
-        <strong>79.25%</strong>
-        <small>AUC: 0.8223</small>
+        <strong>{{ formatPercent(summary?.metrics.correctRate) }}</strong>
+        <small>AUC: {{ formatDecimal(summary?.metrics.areaUnderROC) }}</small>
       </article>
     </section>
 
@@ -119,13 +119,14 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { EChartsOption } from 'echarts';
 import EChart from '@/components/EChart.vue';
-import { fetchSampleUsers, fetchUserLabels, fetchUserProfile } from '@/api/dashboard';
-import type { UserLabel, UserProfileData } from '@/types/dashboard';
+import { fetchSampleUsers, fetchScreenSummary, fetchUserLabels, fetchUserProfile } from '@/api/dashboard';
+import type { ScreenSummary, UserLabel, UserProfileData } from '@/types/dashboard';
 
 const userId = ref('2698243');
 const sampleUsers = ref<number[]>([]);
 const profileData = ref<UserProfileData | null>(null);
 const labelDetails = ref<UserLabel[]>([]);
+const summary = ref<ScreenSummary | null>(null);
 const detailVisible = ref(false);
 const profileLoading = ref(false);
 const hasSearched = ref(false);
@@ -136,6 +137,18 @@ const profileReady = computed(() => Boolean(profileData.value && !profileData.va
 
 function updateClock() {
   currentTime.value = new Date().toLocaleString('zh-CN', { hour12: false });
+}
+
+function formatNumber(value?: number) {
+  return Number.isFinite(Number(value)) ? Number(value).toLocaleString() : '--';
+}
+
+function formatPercent(value?: number) {
+  return Number.isFinite(Number(value)) ? `${(Number(value) * 100).toFixed(2)}%` : '--';
+}
+
+function formatDecimal(value?: number) {
+  return Number.isFinite(Number(value)) ? Number(value).toFixed(4) : '--';
 }
 
 function validateUserId() {
@@ -315,6 +328,11 @@ onMounted(async () => {
     sampleUsers.value = await fetchSampleUsers();
   } catch (error) {
     ElMessage.warning('示例用户加载失败');
+  }
+  try {
+    summary.value = await fetchScreenSummary();
+  } catch (error) {
+    ElMessage.warning('画像汇总加载失败');
   }
 });
 

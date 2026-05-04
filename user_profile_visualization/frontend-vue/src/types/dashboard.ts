@@ -42,3 +42,19 @@ export interface ParentStat {
   parent_label: string;
   cnt: number;
 }
+
+export interface ModelMetrics {
+  sampleCount?: number;
+  trainCount?: number;
+  validationCount?: number;
+  correctRate?: number;
+  areaUnderROC?: number;
+  areaUnderPR?: number;
+}
+
+export interface ScreenSummary {
+  totalUsers: number;
+  totalLabels: number;
+  labelCategoryCount: number;
+  metrics: ModelMetrics;
+}

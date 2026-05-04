@@ -9,6 +9,7 @@
     <modules>
         <module>spark_hadoop_common</module>
         <module>user_profile_project</module>
+        <module>user_profile_project_v2</module>
         <module>law_project</module>
         <module>timer_job_core</module>
         <module>timer_job_admin</module>

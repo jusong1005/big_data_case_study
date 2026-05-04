@@ -27,13 +27,13 @@
       </article>
       <article class="metric-card">
         <span>SVM 准确率</span>
-        <strong>79.25%</strong>
-        <small>AUC: 0.8223</small>
+        <strong>{{ formatPercent(summary?.metrics.correctRate) }}</strong>
+        <small>AUC: {{ formatDecimal(summary?.metrics.areaUnderROC) }}</small>
       </article>
       <article class="metric-card">
         <span>画像标签数</span>
-        <strong>9</strong>
-        <small>消费 / 业务 / 预测</small>
+        <strong>{{ formatNumber(summary?.labelCategoryCount) }}</strong>
+        <small>{{ formatNumber(summary?.totalLabels) }} 条标签</small>
       </article>
     </section>
 
@@ -94,12 +94,13 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import type { EChartsOption } from 'echarts';
 import EChart from '@/components/EChart.vue';
-import { fetchLabelStats, fetchParentStats, fetchRealtimeData } from '@/api/dashboard';
-import type { LabelStat, ParentStat, RealtimeData } from '@/types/dashboard';
+import { fetchLabelStats, fetchParentStats, fetchRealtimeData, fetchScreenSummary } from '@/api/dashboard';
+import type { LabelStat, ParentStat, RealtimeData, ScreenSummary } from '@/types/dashboard';
 
 const realtime = ref<RealtimeData>({});
 const labelStats = ref<LabelStat[]>([]);
 const parentStats = ref<ParentStat[]>([]);
+const summary = ref<ScreenSummary | null>(null);
 const currentTime = ref('');
 let clockTimer: number | undefined;
 let realtimeTimer: number | undefined;
@@ -118,6 +119,14 @@ function formatMoney(value?: string | number) {
   return Number.isFinite(num) ? `¥${num.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` : '--';
 }
 
+function formatPercent(value?: number) {
+  return Number.isFinite(Number(value)) ? `${(Number(value) * 100).toFixed(2)}%` : '--';
+}
+
+function formatDecimal(value?: number) {
+  return Number.isFinite(Number(value)) ? Number(value).toFixed(4) : '--';
+}
+
 async function loadRealtime() {
   try {
     realtime.value = await fetchRealtimeData();
@@ -128,9 +137,10 @@ async function loadRealtime() {
 
 async function loadStats() {
   try {
-    const [parents, labels] = await Promise.all([fetchParentStats(), fetchLabelStats()]);
+    const [parents, labels, nextSummary] = await Promise.all([fetchParentStats(), fetchLabelStats(), fetchScreenSummary()]);
     parentStats.value = parents;
     labelStats.value = labels;
+    summary.value = nextSummary;
   } catch (error) {
     ElMessage.error('标签统计加载失败');
   }
